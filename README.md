@@ -7,3 +7,9 @@ Website Scraped: Dutch housing website featuring apartment listings.
 Cities Covered: Three major cities in the Netherlands.
 Data Extracted: All available apartment listings, including key details such as price, location, size, and more.
 Pages Scraped: Multiple pages per city to ensure thorough data collection.
+
+# File Descriptions
+
+Housing.ipynb: A Jupyter Notebook file containing the code used for web scraping.
+Python Code - Web scraping apartments: the code used for web scraping.
+NetherlandsListings.xlsx: An Excel file containing the output of the scraped data. This file includes all the apartment listings extracted from the Dutch housing website, organized in a spreadsheet format for easy analysis and visualization.
