@@ -1,0 +1,59 @@
+
+# Importing required packages:
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+
+
+# Get headers from https://httpbin.org/get , so that the website will allow me to access its data without assuming that I'm a robot:
+headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36 Edg/99.0.1150.30", 
+    "X-Amzn-Trace-Id": "Root=1-6227a395-53abbdc44198762105fbcd6d"}
+
+# Creating a list:
+sectionlist = []
+
+# Creating a function where we can put any city and number of pages from the website:
+def getSections(city, page):
+    url = f'https://www.pararius.com/apartments/{city}/page-{page}'
+    r = requests.get(url, headers=headers)
+    soup = BeautifulSoup(r.text, 'html.parser')
+    lists = soup.find_all('li', {'class': 'search-list__item search-list__item--listing'}) # using findAll to find every single section (listing) the web page 
+    print(len(lists))
+
+    # Loop over every section on the web page:
+    for list in lists:
+        section = {
+
+        # Get the 'name of the city', 'title of the apartment', 'location', 'price', 'area', 'number of rooms', and 'link to the listing' of the city in the Netherlands:  
+        'city' : city,
+        'title' : list.find('a', class_="listing-search-item__link--title").text.replace('\n', '').strip(),
+        'location' : list.find('div', class_="listing-search-item__location").text.replace('\n', '').strip(),
+        'price' : list.find('div', class_="listing-search-item__price").text.replace('\n', '').strip(),
+        'area' : list.find('li', class_="illustrated-features__item--surface-area").text.replace('\n', '') .strip(),
+        'rooms' : list.find('li', class_="illustrated-features__item illustrated-features__item--number-of-rooms").text.replace('\n', '').strip(),
+        'links' : "https://www.pararius.com" + list.find('a', class_="listing-search-item__link listing-search-item__link--title") ['href']
+        } 
+
+        # Searching for each item alone so we use 'find'
+        # Use ".text": because we want the text of the HTML
+        # Replace('\n', '') : replacing the extra '\n' with white space
+        
+        # Append the listing section into a list:
+        sectionlist.append(section)
+    return
+
+# Loop over the pages:
+for x in range(1,34,1):
+  # extracting the data from three cities
+    print(f'Getting page: {x}')
+    getSections('amsterdam', x)
+    getSections('rotterdam', x)
+    getSections('amstelveen', x)
+    
+# Save listings in a data frame:
+df = pd.DataFrame(sectionlist)
+print(len(sectionlist))
+
+# Output the scraped data into an Excel file:
+df.to_excel('NetherlandsListings.xlsx', index=False)
+print('Scraping is done')
